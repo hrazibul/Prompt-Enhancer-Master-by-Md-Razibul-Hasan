@@ -39,8 +39,13 @@ const enhancementModes: EnhancementMode[] = [
   { id: 'high', name: 'High', description: 'Ultimate coding', icon: BoltIcon, locked: true },
 ];
 
-export const PromptEnhancer: React.FC = () => {
-  const [prompt, setPrompt] = useState('');
+interface PromptEnhancerProps {
+  prompt: string;
+  onPromptChange: (newPrompt: string) => void;
+  onLockClick: () => void;
+}
+
+export const PromptEnhancer: React.FC<PromptEnhancerProps> = ({ prompt, onPromptChange, onLockClick }) => {
   const [enhancedPrompt, setEnhancedPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -143,15 +148,17 @@ export const PromptEnhancer: React.FC = () => {
                             <li key={mode.id} role="option" aria-selected={selectedMode.id === mode.id}>
                                 <button
                                     onClick={() => {
-                                        if (!mode.locked) {
+                                        if (mode.locked) {
+                                            onLockClick();
+                                            setIsDropdownOpen(false);
+                                        } else {
                                             setSelectedMode(mode);
                                             setIsDropdownOpen(false);
                                         }
                                     }}
-                                    disabled={mode.locked}
                                     className={`w-full flex items-center justify-between text-left p-3 rounded-md transition-colors ${
                                         selectedMode.id === mode.id ? 'bg-emerald-900/50' : 'hover:bg-gray-700/50'
-                                    } ${mode.locked ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                    } ${mode.locked ? 'opacity-60' : ''}`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="w-6 flex-shrink-0 flex items-center">
@@ -180,9 +187,9 @@ export const PromptEnhancer: React.FC = () => {
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-1 relative">
                 <textarea
                     value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
+                    onChange={(e) => onPromptChange(e.target.value)}
                     maxLength={MAX_PROMPT_LENGTH}
-                    placeholder="Enter your prompt here to enhance it for better AI interactions..."
+                    placeholder="Enter your prompt here or try an example below..."
                     className="w-full h-64 md:h-80 bg-transparent text-gray-300 placeholder-gray-500 focus:outline-none resize-none p-4"
                 />
                 <div className="absolute bottom-3 right-4 text-xs text-gray-500">

@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { PromptEnhancer } from './components/PromptEnhancer';
 import { AccordionSection } from './components/AccordionSection';
+import { AuthModal } from './components/AuthModal';
+import { ExamplePrompts } from './components/ExamplePrompts';
 
 function App() {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [prompt, setPrompt] = useState('');
+
+  const handleExampleClick = (exampleText: string) => {
+    setPrompt(exampleText);
+    const enhancerElement = document.getElementById('enhancer');
+    if (enhancerElement) {
+      enhancerElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-gray-300 font-sans antialiased">
       <div 
@@ -14,7 +28,7 @@ function App() {
         }}
       />
       <div className="relative z-10 flex flex-col min-h-screen">
-        <Header />
+        <Header onSignInClick={() => setIsAuthModalOpen(true)} />
         <main className="flex-grow container mx-auto px-4 py-12 md:py-20">
           <section className="text-center mb-16 md:mb-24">
             <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight mb-4">
@@ -32,13 +46,20 @@ function App() {
           </section>
           
           <div id="enhancer">
-            <PromptEnhancer />
+            <PromptEnhancer 
+              prompt={prompt}
+              onPromptChange={setPrompt}
+              onLockClick={() => setIsAuthModalOpen(true)} 
+            />
           </div>
+
+          <ExamplePrompts onExampleClick={handleExampleClick} />
 
           <AccordionSection />
         </main>
         <Footer />
       </div>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }
